@@ -138,3 +138,5 @@ model_training/*
 # directories to keep
 !.gitkeep
 mlruns/*
+result/*
+data/.DS_Store

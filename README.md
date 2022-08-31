@@ -1,5 +1,4 @@
-# ML_project_template
-Template and utils code for machine learning project
+# [2016 Expedia Hotel Recommendation](https://www.kaggle.com/competitions/expedia-hotel-recommendations/overview)
 
 ## Project Structure
 1. src/ all source code of this project 
@@ -43,20 +42,3 @@ python scripts/model_eval.py
 # code test: add `-s` for more detailed output
 pytest -s tests
 ```
-MLflow
-```
-mlflow run . -e cla_data_cvt
-
-```
-## TODO
-
-1. [ ] conda environment setup test
-2. [ ] re-organize src/utils
-3. [ ] LightGBM support
-4. [ ] deep learning support
-
-
-
-## Reference 
-
-1. [Cookiecutter Data Science Project](https://drivendata.github.io/cookiecutter-data-science/)

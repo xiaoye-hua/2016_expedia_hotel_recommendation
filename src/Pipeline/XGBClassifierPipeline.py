@@ -169,7 +169,7 @@ class XGBClassifierPipeline(BasePipeline):
                                      show_feature_num=show_feature_num,
                                      fig_dir=fig_dir)
             logging.info(f"Ploting SHAP value:")
-            self.plot_shap_importance(X=X, columns_names=feature_cols, fig_dir=fig_dir, show_feature_num=show_feature_num)
+            # self.plot_shap_importance(X=X, columns_names=feature_cols, fig_dir=fig_dir, show_feature_num=show_feature_num)
         predict_prob = self.pipeline.predict_proba(X=X.copy())[:, 1]
         binary_classification_eval(test_y=y, predict_prob=predict_prob, fig_dir=fig_dir)
         mlflow.log_metrics({"log_loss": 0.98, "accuracy":0.099})
@@ -183,31 +183,31 @@ class XGBClassifierPipeline(BasePipeline):
             p95 = np.percentile(X['abs_diff'].tolist(), 95)
             assert p95 < threshold_95, f"95 percentile should be smaller than {p95}"
 
-    def plot_shap_importance(self, X, columns_names, show_feature_num, fig_dir=None):
-        import shap
-        import scipy
-        explainer = shap.Explainer(self.pipeline['model'])
-        features = self.pipeline[self.data_transfomer_name].transform(X.copy())
-        # if isinstance(features, scipy.sparse._csr.csr_matrix):
-        #     features = features.toarray()
-        df = pd.DataFrame(features, columns=columns_names)
-        shap_values = explainer(df)
-        plt.figure()
-        shap.plots.beeswarm(shap_values, max_display=show_feature_num, show=False)
-        plt.title("Shap Feature Importance")
-        if fig_dir is not None:
-            plt.savefig(os.path.join(fig_dir, 'shap_feature_importance.png'), bbox_inches = 'tight')
-            # plt.savefig(os.path.join(fig_dir, 'shap_feature_importance.pdf'))
-        else:
-            plt.show()
-
-        plt.figure()
-        shap.plots.bar(shap_values.abs.mean(0), show=False, max_display=show_feature_num)
-        plt.title("Shap Feature Importance Bar plot")
-        if fig_dir is not None:
-            plt.savefig(os.path.join(fig_dir, 'shap_feature_importance_bar.png'), bbox_inches = 'tight')
-        else:
-            plt.show()
+    # def plot_shap_importance(self, X, columns_names, show_feature_num, fig_dir=None):
+    #     import shap
+    #     import scipy
+    #     explainer = shap.Explainer(self.pipeline['model'])
+    #     features = self.pipeline[self.data_transfomer_name].transform(X.copy())
+    #     # if isinstance(features, scipy.sparse._csr.csr_matrix):
+    #     #     features = features.toarray()
+    #     df = pd.DataFrame(features, columns=columns_names)
+    #     shap_values = explainer(df)
+    #     plt.figure()
+    #     shap.plots.beeswarm(shap_values, max_display=show_feature_num, show=False)
+    #     plt.title("Shap Feature Importance")
+    #     if fig_dir is not None:
+    #         plt.savefig(os.path.join(fig_dir, 'shap_feature_importance.png'), bbox_inches = 'tight')
+    #         # plt.savefig(os.path.join(fig_dir, 'shap_feature_importance.pdf'))
+    #     else:
+    #         plt.show()
+    #
+    #     plt.figure()
+    #     shap.plots.bar(shap_values.abs.mean(0), show=False, max_display=show_feature_num)
+    #     plt.title("Shap Feature Importance Bar plot")
+    #     if fig_dir is not None:
+    #         plt.savefig(os.path.join(fig_dir, 'shap_feature_importance_bar.png'), bbox_inches = 'tight')
+    #     else:
+    #         plt.show()
 
     def _plot_eval_result(self):
         # retrieve performance metrics

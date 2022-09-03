@@ -9,9 +9,10 @@ import pickle
 import mlflow
 from datetime import datetime
 
-from scripts.train_config import train_config_detail
+from scripts.train_config import train_config_detail, mlflow_cate
 from scripts.train_config import raw_data_path, dir_mark, debug, model_dir
 from src.config import log_dir
+
 
 # =============== Config ============
 curDT = datetime.now()
@@ -126,6 +127,7 @@ train_params.update(additional_train_params)
 
 logging.info(f"Model training...")
 with mlflow.start_run(run_name='model_train'):
+    # mlflow.log_text(mlflow_cate)
     mlflow.log_params({
         'begin_date': '2022-01-01',
         'end_date': '2022-04-03',
@@ -135,16 +137,18 @@ with mlflow.start_run(run_name='model_train'):
     pipeline = pipeline_class(model_path=model_path, model_training=True,
                               model_params=model_params, task=task)
     logging.info(f"Origin train data shape : {train_df[feature_cols].shape}")
-    pipeline.train(X=train_df[feature_cols], y=train_df[target_col], train_params=train_params)
+    pipeline.train(X=train_df[feature_used], y=train_df[target_col], train_params=train_params)
     logging.info(f"Model saving to {model_path}..")
     pipeline.save_pipeline()
 
 logging.info(f"Loading model from {model_path}")
-new_pipeline = pipeline_class(model_path=model_path, model_training=False, model_params={}
-                              , load_pmml=True)
+new_pipeline = pipeline_class(model_path=model_path,
+                              model_training=False, model_params={}
+                              )
 logging.info(f"Model eval...")
 logging.info(f"There are {len(feature_cols)} features:")
 logging.info(f"{feature_cols}")
 new_pipeline.eval(X=test_df[feature_cols], y=test_df[target_col],
               performance_result_file='all_data_performance.txt',
-              compare_pmml=True)
+              # compare_pmml=True
+                  )

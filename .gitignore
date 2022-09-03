@@ -130,8 +130,8 @@ dmypy.json
 
 # files from Pycharm
 .idea
-data/raw_data/*
-data/debug_data/*
+data/production/*
+data/debug/*
 logs/*
 model_training/*
 

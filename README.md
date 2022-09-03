@@ -23,7 +23,7 @@ conda env export --no-builds > environment.yaml
 
 
 # create jupyter kernel
-python -m ipykernel install --user --name ml_project --display-name "Python3.8(ml_project)"
+python -m ipykernel install --user --name ml_project --display-name "Python3.8(expedia)"
 ```
 ### Step 2: Model training, eval, or code test
 

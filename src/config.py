@@ -9,3 +9,4 @@ california_target = 'MedHouseVal'
 breast_cancel_traget = 'target'
 
 log_dir = 'logs'
+target_col = 'is_booking'

@@ -7,6 +7,7 @@ import pandas as pd
 import os
 import logging
 from datetime import datetime
+import pandas_profiling
 
 from scripts.train_config import train_config_detail #, train_end_date, train_begin_date, eval_end_date, eval_begin_date, test_begin_date, test_end_date
 from scripts.train_config import raw_data_path, dir_mark, debug #, debug_date, offer_served_data_source
@@ -40,6 +41,7 @@ logging.getLogger().addHandler(console)
 
 train_end_time = '2014-03-01 00:00:00'
 train_eval_end_time = '2014-07-01 00:00:00'
+profilling = False
 
 # train_end_time = '2014-12-31 23:30:00'
 # train_eval_end_time = '2014-12-31 23:45:00'
@@ -63,27 +65,37 @@ check_create_dir(directory=target_raw_data_dir)
 
 fc = feature_creator_class()
 # feature_creator
+logging.info(f"Saving data to dir: {target_raw_data_dir}")
+
 import time
 begin = time.time()
 train_df = fc.get_features(df=train)
 end = time.time()
 logging.info(f"Train data time: {round((end-begin)/3600, 3)} hours")
+train_df.to_csv(os.path.join(target_raw_data_dir, 'train.csv'), index=False)
+if profilling:
+    profile = pandas_profiling.ProfileReport(train_df)
+    profile.to_file(os.path.join(target_raw_data_dir, 'train_df_profile.html'))
+del train_df
 # if not debug:X
 begin = time.time()
 eval_df = fc.get_features(df=eval)
 end = time.time()
 logging.info(f"Eval data time: {round((end-begin)/3600, 3)} hours")
+eval_df.to_csv(os.path.join(target_raw_data_dir, 'eval.csv'), index=False)
+if profilling:
+    profile = pandas_profiling.ProfileReport(eval_df)
+    profile.to_file(os.path.join(target_raw_data_dir, 'eval_df_profile.html'))
+del eval_df
 # if not debug:X
 begin = time.time()
 test_df = fc.get_features(df=test)
 end = time.time()
 logging.info(f"Test data time: {round((end-begin)/3600, 3)} hours")
-
-logging.info(f"Saving data to dir: {target_raw_data_dir}")
-logging.info(f"train_df {train_df.shape}\nEval_df: {eval_df.shape}\nTest_df: {test_df.shape}")
-train_df.to_csv(os.path.join(target_raw_data_dir, 'train.csv'), index=False)
-eval_df.to_csv(os.path.join(target_raw_data_dir, 'eval.csv'), index=False)
 test_df.to_csv(os.path.join(target_raw_data_dir, 'test.csv'), index=False)
+if profilling:
+    profile = pandas_profiling.ProfileReport(test_df)
+    profile.to_file(os.path.join(target_raw_data_dir, 'test_df_profile.html'))
 
 
 

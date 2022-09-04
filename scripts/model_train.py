@@ -36,8 +36,11 @@ model_params_config = train_config_detail[dir_mark].get('model_params', {})
 train_valid = train_config_detail[dir_mark].get('train_valid', False)
 dense_features = train_config_detail[dir_mark].get('dense_features', None)
 sparse_features = train_config_detail[dir_mark].get('sparse_features', None)
+onehot_features = train_config_detail[dir_mark].get('onehot', None)
 feature_clean_func = train_config_detail[dir_mark].get('feature_clean_func', None)
 additional_train_params = train_config_detail[dir_mark].get('additional_train_params', {})
+
+destination_latent_include = train_config_detail[dir_mark].get('destination_latent_include', False)
 
 epochs = train_config_detail[dir_mark].get('epochs', None)
 batch_size = train_config_detail[dir_mark].get('batch_size', None)
@@ -58,13 +61,26 @@ train_df = pd.read_csv(os.path.join(target_raw_data_dir, 'train.csv'))
 eval_df = pd.read_csv(os.path.join(target_raw_data_dir, 'eval.csv'))
 test_df = pd.read_csv(os.path.join(target_raw_data_dir, 'test.csv'))
 
-print(train_df[feature_used].info())
+frac = 0.1
+train_df = train_df.sample(int(len(train_df)*frac))
+eval_df = eval_df.sample(int(len(eval_df)*frac))
+test_df = test_df.sample(int(len(test_df)*frac))
+
 
 if feature_clean_func is not None:
     train_df = feature_clean_func(df=train_df)
     eval_df = feature_clean_func(df=eval_df)
     test_df = feature_clean_func(df=test_df)
 
+if destination_latent_include:
+    kaggle_original_data_path = os.path.join(raw_data_path, 'kaggle_original_data')
+    logging.info(f"Loading destination latent variable from {kaggle_original_data_path}")
+    latent_feature = pd.read_csv(os.path.join(kaggle_original_data_path, 'destinations.csv'))
+    train_df = train_df.merge(latent_feature, how='left', on='srch_destination_id')
+    eval_df = eval_df.merge(latent_feature, how='left', on='srch_destination_id')
+    test_df = test_df.merge(latent_feature, how='left', on='srch_destination_id')
+
+logging.info(train_df[feature_used].info())
 df_for_encode_train = pd.concat([train_df, eval_df, test_df], axis=0)
 
 
@@ -121,6 +137,7 @@ train_params = {
     # , 'grid_search_dict': grid_search_dict
     , 'sparse_features': sparse_features
     , 'dense_features': dense_features
+    , 'onehot_encode':onehot_features
 }
 
 train_params.update(additional_train_params)
